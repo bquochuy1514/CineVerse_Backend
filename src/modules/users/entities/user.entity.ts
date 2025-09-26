@@ -1,0 +1,41 @@
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserRole } from '../enums/user-role.enum';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn({ type: 'bigint' })
+  id: number;
+
+  @Column({ type: 'varchar', unique: true })
+  email: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  password: string;
+
+  @Column({ name: 'full_name', type: 'varchar' })
+  fullName: string;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  phone: string;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
+  role: UserRole;
+
+  @Column({ name: 'is_active', type: 'boolean', default: false })
+  isActive: boolean;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
+  updatedAt: Date;
+
+  // @OneToMany(() => SocialAccount, (socialAccount) => socialAccount.user)
+  // socialAccounts: SocialAccount[];
+}
