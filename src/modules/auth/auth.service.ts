@@ -32,5 +32,7 @@ export class AuthService {
     };
   }
 
-  handleRegister(registerDto: RegisterDto) {}
+  handleRegister(registerDto: RegisterDto) {
+    return this.usersService.handleRegister(registerDto);
+  }
 }

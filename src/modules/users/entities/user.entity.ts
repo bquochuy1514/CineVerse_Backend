@@ -27,6 +27,12 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
   role: UserRole;
 
+  @Column({ nullable: true })
+  codeId: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  codeExpiration: Date;
+
   @Column({ name: 'is_active', type: 'boolean', default: false })
   isActive: boolean;
 

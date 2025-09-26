@@ -34,4 +34,8 @@ export class RegisterDto {
   @IsOptional()
   @IsPhoneNumber('VN', { message: 'Số điện thoại không hợp lệ' })
   phone: string;
+
+  codeId: string;
+
+  codeExpired: Date;
 }
