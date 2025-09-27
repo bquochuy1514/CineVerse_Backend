@@ -1,0 +1,170 @@
+<html lang='vi'>
+
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>CineVerse - Kích hoạt tài khoản</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f4f4;
+        color: #333333;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+        padding: 40px;
+        text-align: center;
+        color: #ffffff;
+      }
+
+      .header h1 {
+        font-size: 36px;
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .header p {
+        margin: 8px 0 0;
+        font-size: 18px;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .content h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #2c3e50;
+        text-align: center;
+      }
+
+      .activation-code {
+        display: inline-block;
+        background: #74b9ff;
+        color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        font-size: 24px;
+        font-weight: 700;
+        text-align: center;
+        margin: 20px auto;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .note {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        font-size: 16px;
+      }
+
+      .features {
+        margin: 20px 0;
+        padding: 10px;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 16px;
+      }
+
+      .feature-item span {
+        margin-right: 10px;
+      }
+
+      .footer {
+        background-color: #2c3e50;
+        color: #ffffff;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .footer p {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .footer a {
+        color: #3498db;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class='container'>
+      <!-- Header -->
+      <div class='header'>
+        <h1>CineVerse</h1>
+        <p>Khám phá thế giới điện ảnh của bạn!</p>
+      </div>
+
+      <!-- Content -->
+      <div class='content'>
+        <h2>Xin chào {{name}}!</h2>
+        <p>Cảm ơn bạn đã đăng ký tài khoản tại
+          <strong>CineVerse</strong>. Để hoàn tất quá trình đăng ký, vui lòng sử
+          dụng mã kích hoạt bên dưới:</p>
+        <div class='activation-code'>{{activationCode}}</div>
+        <p>Vui lòng nhập mã này trong vòng
+          <strong>5 phút</strong>
+          để kích hoạt tài khoản của bạn.</p>
+        <p>Nếu bạn không đăng ký tài khoản CineVerse, hãy bỏ qua email này.</p>
+
+        <!-- Note -->
+        <div class='note'>
+          <strong>Lưu ý:</strong>
+          Hãy kiểm tra thư mục spam nếu bạn không thấy email này trong hộp thư
+          đến.
+        </div>
+
+        <!-- Features -->
+        <div class='features'>
+          <h3>Những điều bạn có thể làm:</h3>
+          <div class='feature-item'>
+            <span>🎥</span>
+            <span>Khám phá hàng ngàn bộ phim đặc sắc</span>
+          </div>
+          <div class='feature-item'>
+            <span>⭐</span>
+            <span>Đánh giá và bình luận về phim yêu thích</span>
+          </div>
+          <div class='feature-item'>
+            <span>📱</span>
+            <span>Tạo danh sách phim cá nhân</span>
+          </div>
+          <div class='feature-item'>
+            <span>🔔</span>
+            <span>Nhận thông báo phim mới và ưu đãi đặc biệt</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class='footer'>
+        <p>Nếu bạn cần hỗ trợ, vui lòng liên hệ với chúng tôi qua email:
+          <a href='mailto:support@cineverse.com'>support@cineverse.com</a></p>
+        <p>© 2025 CineVerse. Tất cả quyền được bảo lưu.</p>
+      </div>
+    </div>
+  </body>
+
+</html>

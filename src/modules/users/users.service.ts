@@ -6,12 +6,14 @@ import { RegisterDto } from '../auth/dto/register.dto';
 import { hashPassword } from 'src/common/utils/password-hash.util';
 import { v4 as uuidv4 } from 'uuid';
 import * as dayjs from 'dayjs';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly mailerService: MailerService,
   ) {}
 
   findUserByEmail(email: string) {
@@ -34,6 +36,26 @@ export class UsersService {
       password: hashedPassword,
     });
 
-    return this.usersRepository.save(createdUser);
+    // Sending email
+    this.mailerService.sendMail({
+      to: createdUser.email, // list of receivers
+      subject: 'Kích hoạt tài khoản CineVerse', // Subject line
+      template: 'register.hbs', // HTML body content
+      context: {
+        name: createdUser.fullName,
+        activationCode: createdUser.codeId,
+      },
+    });
+
+    await this.usersRepository.save(createdUser);
+
+    return {
+      message:
+        'Register successfully! Please check your email to activate your account.',
+      user: {
+        id: createdUser.id,
+        email: createdUser.email,
+      },
+    };
   }
 }

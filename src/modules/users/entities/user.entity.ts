@@ -27,7 +27,7 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
   role: UserRole;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   codeId: string;
 
   @Column({ type: 'timestamp', nullable: true })
