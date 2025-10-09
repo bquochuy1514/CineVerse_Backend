@@ -24,7 +24,9 @@ export class UsersService {
     // Check existed user
     const existedUser = await this.findUserByEmail(registerDto.email);
     if (existedUser) {
-      throw new BadRequestException('Email is already registered!');
+      throw new BadRequestException(
+        'Email này đã tồn tại trong hệ thống. Vui lòng đăng nhập hoặc chọn email khác.',
+      );
     }
 
     // Hash password
@@ -51,7 +53,7 @@ export class UsersService {
 
     return {
       message:
-        'Register successfully! Please check your email to activate your account.',
+        'Đăng kí thành công! Vui lòng kiểm tra email để kích hoạt tài khoản',
       user: {
         id: createdUser.id,
         email: createdUser.email,

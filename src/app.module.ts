@@ -35,8 +35,8 @@ import { join } from 'path';
       inject: [ConfigService], // inject service vào
       useFactory: async (configService: ConfigService) => ({
         transport: {
-          host: 'smtp.gmail.com',
-          port: 465,
+          host: configService.get<string>('MAIL_HOST'),
+          port: configService.get<number>('MAIL_PORT'),
           secure: true,
           // ignoreTLS: true,
           // secure: false,

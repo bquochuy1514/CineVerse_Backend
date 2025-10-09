@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserRole } from '../enums/user-role.enum';
+import { UserGender, UserRole } from '../enums/user.enum';
 
 @Entity('users')
 export class User {
@@ -24,8 +24,17 @@ export class User {
   @Column({ type: 'varchar', length: 20, nullable: true })
   phone: string;
 
+  @Column({ type: 'varchar', default: '/images/users/default_avatar.jpg' })
+  avatar: string;
+
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
   role: UserRole;
+
+  @Column({ type: 'enum', enum: UserGender, nullable: true })
+  gender: UserGender;
+
+  @Column({ type: 'date', name: 'date_of_birth', nullable: true })
+  dateOfBirth: Date;
 
   @Column({ type: 'varchar', nullable: true })
   codeId: string;

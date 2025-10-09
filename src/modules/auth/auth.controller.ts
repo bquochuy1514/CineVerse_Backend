@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { MailerService } from '@nestjs-modules/mailer';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,10 +22,32 @@ export class AuthController {
   ) {}
 
   @Post('login')
-  @UseGuards(LocalAuthGuard)
-  login(@Request() req) {
-    return this.authService.login(req.user);
+  @UsePipes(ValidationPipe)
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
+
+  // @Post('login')
+  // @UsePipes(ValidationPipe)
+  // async login(@Body() loginDto: LoginDto) {
+  //   const user = await this.authService.validateUser(loginDto);
+  //   if (!user) {
+  //     throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
+  //   } else {
+  //     if (user.isActive === false) {
+  //       throw new BadRequestException(
+  //         'Tài khoản chưa được kích hoạt! Vui lòng kích hoạt tài khoản',
+  //       );
+  //     }
+  //   }
+  //   return this.authService.login(user);
+  // }
+
+  // @Post('login')
+  // @UseGuards(LocalAuthGuard)
+  // login(@Request() req) {
+  //   return this.authService.login(req.user);
+  // }
 
   @Post('register')
   @UsePipes(ValidationPipe)

@@ -8,7 +8,7 @@ import {
   IsEnum,
   IsBoolean,
 } from 'class-validator';
-import { UserRole } from '../enums/user-role.enum';
+import { UserRole } from '../enums/user.enum';
 
 export class CreateUserDto {
   @IsEmail({}, { message: 'Email phải có định dạng hợp lệ' })

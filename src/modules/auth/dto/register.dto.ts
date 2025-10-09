@@ -1,8 +1,6 @@
 import {
   IsEmail,
   IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
   IsString,
   Matches,
   MinLength,
@@ -31,11 +29,18 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'Họ tên không được để trống' })
   fullName: string;
 
-  @IsOptional()
-  @IsPhoneNumber('VN', { message: 'Số điện thoại không hợp lệ' })
-  phone: string;
+  // @IsOptional()
+  // @IsEnum(UserGender, { message: 'Giới tính phải là male hoặc female' })
+  // gender: UserGender;
 
-  codeId: string;
+  // @IsDateString(
+  //   {},
+  //   { message: 'Ngày sinh phải có định dạng hợp lệ (YYYY-MM-DD)' },
+  // )
+  // @IsOptional()
+  // dateOfBirth: string;
 
-  codeExpired: Date;
+  // @IsOptional()
+  // @IsPhoneNumber('VN', { message: 'Số điện thoại không hợp lệ' })
+  // phone: string;
 }
