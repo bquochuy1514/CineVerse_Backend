@@ -13,6 +13,11 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { MailerService } from '@nestjs-modules/mailer';
 import { LoginDto } from './dto/login.dto';
+import { VerifyAccountDto } from './dto/verify-account.dto';
+import { ResendCodeDto } from './dto/resend-code.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,8 +28,45 @@ export class AuthController {
 
   @Post('login')
   @UsePipes(ValidationPipe)
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  login(@Body() loginDto: LoginDto) {
+    return this.authService.handleLogin(loginDto);
+  }
+
+  @Post('register')
+  @UsePipes(ValidationPipe)
+  register(@Body() registerDto: RegisterDto) {
+    return this.authService.handleRegister(registerDto);
+  }
+
+  @Post('verify-account')
+  @UsePipes(ValidationPipe)
+  verifyAccount(@Body() verifyAccountDto: VerifyAccountDto) {
+    return this.authService.handleVerifyAccount(verifyAccountDto);
+  }
+
+  @Post('resend-code')
+  resendCode(@Body() resendCodeDto: ResendCodeDto) {
+    return this.authService.handleResendCode(resendCodeDto);
+  }
+
+  @Post('forgot-password')
+  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.handleForgotPassword(forgotPasswordDto);
+  }
+
+  @Post('resend-otp')
+  resendOTP(@Body('email') email: string) {
+    return this.authService.handleResendOTP(email);
+  }
+
+  @Post('verify-otp')
+  verifyOTP(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.authService.handleVerifyOTP(verifyOtpDto);
+  }
+
+  @Post('reset-password')
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.handleResetPassword(resetPasswordDto);
   }
 
   // @Post('login')
@@ -48,12 +90,6 @@ export class AuthController {
   // login(@Request() req) {
   //   return this.authService.login(req.user);
   // }
-
-  @Post('register')
-  @UsePipes(ValidationPipe)
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.handleRegister(registerDto);
-  }
 
   @Get('status')
   // Dùng use guard này để bảo vệ route, đòi bearer token

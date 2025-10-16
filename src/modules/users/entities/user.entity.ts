@@ -36,14 +36,23 @@ export class User {
   @Column({ type: 'date', name: 'date_of_birth', nullable: true })
   dateOfBirth: Date;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ name: 'code_id', type: 'varchar', nullable: true })
   codeId: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ name: 'code_expiration', type: 'timestamp', nullable: true })
   codeExpiration: Date;
 
   @Column({ name: 'is_active', type: 'boolean', default: false })
   isActive: boolean;
+
+  @Column({ name: 'code_otp', type: 'varchar', length: 6, nullable: true })
+  codeOTP: string;
+
+  @Column({ name: 'code_otp_expiration', type: 'timestamp', nullable: true })
+  codeOTPExpiration: Date;
+
+  @Column({ name: 'is_otp_verified', type: 'boolean', default: false })
+  isOtpVerified: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
