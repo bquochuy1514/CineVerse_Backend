@@ -28,6 +28,7 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { ConfigType } from '@nestjs/config';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -84,14 +85,14 @@ export class AuthService {
     // Ở đây user chắc chắn sẽ được trả, các throw exception đã được xử lí ở validateUser
     const user = await this.validateUser(loginDto);
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
-
-    const token = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
+    const { accessToken, refreshToken } = await this.generateTokens(user);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+    await this.usersRepository.update({ id: user.id }, { hashedRefreshToken });
 
     return {
+      message: 'Đăng nhập thành công',
       user,
-      access_token: token,
+      access_token: accessToken,
       refresh_token: refreshToken,
     };
   }
@@ -139,13 +140,63 @@ export class AuthService {
     };
   }
 
-  handleRefreshToken(user: any) {
-    const payload = { sub: user.sub, email: user.email, role: user.role };
-    const token = this.jwtService.sign(payload);
+  async handleLogout(user: any) {
+    const userDB = await this.usersService.findUserByEmail(user.email);
+    if (!userDB) throw new BadRequestException();
+
+    if (!userDB.hashedRefreshToken)
+      throw new BadRequestException('Internal Server Error');
+
+    await this.usersRepository.update(
+      { id: userDB.id },
+      { hashedRefreshToken: null },
+    );
+
+    return { message: 'Bạn đã đăng xuất' };
+  }
+
+  async generateTokens(user: any) {
+    const payload = { sub: user.id, email: user.email, role: user.role };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload),
+      this.jwtService.signAsync(payload, this.refreshTokenConfig),
+    ]);
 
     return {
-      access_token: token,
+      accessToken,
+      refreshToken,
     };
+  }
+
+  async handleRefreshToken(user: any) {
+    user.id = user.sub;
+    const { accessToken, refreshToken } = await this.generateTokens(user);
+
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+
+    await this.usersRepository.update({ id: user.id }, { hashedRefreshToken });
+
+    return {
+      user,
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
+  // refreshToken ở đây được extract từ header request, nó là original refresh token chưa được hash
+  async validateRefreshToken(user: any, refreshToken: string) {
+    const userDB = await this.usersService.findUserByEmail(user.email);
+    if (!userDB || !userDB.hashedRefreshToken)
+      throw new UnauthorizedException('Invalid Refresh Token');
+
+    const refreshTokenMatches = await argon2.verify(
+      userDB.hashedRefreshToken,
+      refreshToken,
+    );
+    if (!refreshTokenMatches)
+      throw new UnauthorizedException('Invalid Refresh Token');
+
+    return user;
   }
 
   // Hàm này để verify account

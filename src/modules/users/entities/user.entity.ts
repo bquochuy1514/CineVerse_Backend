@@ -56,6 +56,9 @@ export class User {
   @Column({ name: 'is_otp_verified', type: 'boolean', default: false })
   isOtpVerified: boolean;
 
+  @Column({ nullable: true })
+  hashedRefreshToken: string;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 

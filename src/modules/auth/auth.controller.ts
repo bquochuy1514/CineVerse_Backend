@@ -42,6 +42,12 @@ export class AuthController {
     return this.authService.handleRegister(registerDto);
   }
 
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  logout(@Req() req) {
+    return this.authService.handleLogout(req.user);
+  }
+
   @UseGuards(RefreshAuthGuard)
   @Post('refresh-token')
   refreshToken(@Req() req) {
