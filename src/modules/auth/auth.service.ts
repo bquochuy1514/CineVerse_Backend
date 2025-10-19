@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -23,12 +25,17 @@ import * as dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { GoogleLoginDto } from './dto/google-login.dto';
+import refreshJwtConfig from './config/refresh-jwt.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    @Inject(refreshJwtConfig.KEY)
+    private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
     private readonly mailerService: MailerService,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -50,8 +57,13 @@ export class AuthService {
       throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
     }
 
-    if (findUser && matchedPassword) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    if (!findUser.isActive) {
+      throw new BadRequestException(
+        'Tài khoản chưa được kích hoạt! Vui lòng kích hoạt tài khoản',
+      );
+    }
+
+    if (findUser && matchedPassword && findUser.isActive) {
       const {
         password,
         codeId,
@@ -72,17 +84,15 @@ export class AuthService {
     // Ở đây user chắc chắn sẽ được trả, các throw exception đã được xử lí ở validateUser
     const user = await this.validateUser(loginDto);
 
-    if (!user.isActive) {
-      throw new BadRequestException(
-        'Tài khoản chưa được kích hoạt! Vui lòng kích hoạt tài khoản',
-      );
-    }
-
     const payload = { sub: user.id, email: user.email, role: user.role };
+
+    const token = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
 
     return {
       user,
-      access_token: this.jwtService.sign(payload),
+      access_token: token,
+      refresh_token: refreshToken,
     };
   }
 
@@ -126,6 +136,15 @@ export class AuthService {
         id: createdUser.id,
         email: createdUser.email,
       },
+    };
+  }
+
+  handleRefreshToken(user: any) {
+    const payload = { sub: user.sub, email: user.email, role: user.role };
+    const token = this.jwtService.sign(payload);
+
+    return {
+      access_token: token,
     };
   }
 
@@ -324,5 +343,27 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     return { message: 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập' };
+  }
+
+  async validateGoogleUser(googleUser: GoogleLoginDto) {
+    // Nếu đã có user trong database => Trả về user đó
+    const user = await this.usersService.findUserByEmail(googleUser.email);
+    if (user) return user;
+
+    // Nếu chưa có user trong database => Tạo user mới và trả về user đó
+    const createdUser = this.usersRepository.create(googleUser);
+    createdUser.isActive = true;
+    createdUser.fullName = `${googleUser.firstName} ${googleUser.lastName}`;
+    return await this.usersRepository.save(createdUser);
+  }
+
+  async loginWithGoogle(user: any) {
+    // user ở đây được Google Strategy trả về, có thể gồm id, email, name, v.v.
+    const payload = { sub: user.id, email: user.email, role: user.role };
+
+    return {
+      user,
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }

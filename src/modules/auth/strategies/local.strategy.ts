@@ -6,16 +6,19 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from '../auth.service';
+import { LoginDto } from '../dto/login.dto';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
-    super({ usernameField: 'email' });
+    super({
+      usernameField: 'email',
+      passwordField: 'password',
+    });
   }
 
   async validate(email: string, password: string) {
     const user = await this.authService.validateUser({ email, password });
-    console.log('inside validate');
     if (!user) {
       throw new UnauthorizedException(
         'Tài khoản hoặc mật khẩu không chính xác',

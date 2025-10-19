@@ -3,7 +3,9 @@ import {
   Controller,
   Get,
   Post,
+  Req,
   Request,
+  Res,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -18,6 +20,8 @@ import { ResendCodeDto } from './dto/resend-code.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { RefreshAuthGuard } from './guards/refresh-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -36,6 +40,12 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   register(@Body() registerDto: RegisterDto) {
     return this.authService.handleRegister(registerDto);
+  }
+
+  @UseGuards(RefreshAuthGuard)
+  @Post('refresh-token')
+  refreshToken(@Req() req) {
+    return this.authService.handleRefreshToken(req.user);
   }
 
   @Post('verify-account')
@@ -69,26 +79,22 @@ export class AuthController {
     return this.authService.handleResetPassword(resetPasswordDto);
   }
 
-  // @Post('login')
-  // @UsePipes(ValidationPipe)
-  // async login(@Body() loginDto: LoginDto) {
-  //   const user = await this.authService.validateUser(loginDto);
-  //   if (!user) {
-  //     throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
-  //   } else {
-  //     if (user.isActive === false) {
-  //       throw new BadRequestException(
-  //         'Tài khoản chưa được kích hoạt! Vui lòng kích hoạt tài khoản',
-  //       );
-  //     }
-  //   }
-  //   return this.authService.login(user);
-  // }
+  @Get('google/login')
+  @UseGuards(GoogleAuthGuard)
+  googleLogin() {}
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  async googleCallback(@Req() req, @Res() res) {
+    const response = await this.authService.loginWithGoogle(req.user);
+    res.redirect(`http://localhost:3000?token=${response.access_token}`);
+  }
 
   // @Post('login')
+  // @UsePipes(ValidationPipe)
   // @UseGuards(LocalAuthGuard)
   // login(@Request() req) {
-  //   return this.authService.login(req.user);
+  //   return this.authService.handleLogin(req.user);
   // }
 
   @Get('status')

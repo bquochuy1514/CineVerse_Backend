@@ -9,6 +9,10 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
+import googleOauthConfig from './config/google-oauth.config';
+import { GoogleStrategy } from './strategies/google.strategy';
+import refreshJwtConfig from './config/refresh-jwt.config';
+import { RefreshJwtStrategy } from './strategies/refresh.strategy';
 
 @Module({
   imports: [
@@ -27,8 +31,16 @@ import { User } from '../users/entities/user.entity';
       imports: [ConfigModule],
       inject: [ConfigService],
     }),
+    ConfigModule.forFeature(googleOauthConfig),
+    ConfigModule.forFeature(refreshJwtConfig),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    GoogleStrategy,
+    RefreshJwtStrategy,
+  ],
 })
 export class AuthModule {}

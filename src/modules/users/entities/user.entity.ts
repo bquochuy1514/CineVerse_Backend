@@ -36,6 +36,7 @@ export class User {
   @Column({ type: 'date', name: 'date_of_birth', nullable: true })
   dateOfBirth: Date;
 
+  // Luồng xác thực tài khoản
   @Column({ name: 'code_id', type: 'varchar', nullable: true })
   codeId: string;
 
@@ -45,6 +46,7 @@ export class User {
   @Column({ name: 'is_active', type: 'boolean', default: false })
   isActive: boolean;
 
+  // Luồng xác thực OTP của quên mật khẩu
   @Column({ name: 'code_otp', type: 'varchar', length: 6, nullable: true })
   codeOTP: string;
 
