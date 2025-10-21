@@ -50,8 +50,20 @@ export class AuthController {
 
   @UseGuards(RefreshAuthGuard)
   @Post('refresh-token')
-  refreshToken(@Req() req) {
-    return this.authService.handleRefreshToken(req.user);
+  async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
+    const result = await this.authService.handleRefreshToken(req.user);
+
+    const { refresh_token } = result;
+
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return result;
   }
 
   @Post('verify-account')
@@ -93,35 +105,16 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   async googleCallback(@Req() req, @Res() res) {
     const response = await this.authService.loginWithGoogle(req.user);
-    res.redirect(`http://localhost:3000?token=${response.access_token}`);
-  }
+    const { access_token, refresh_token } = response;
 
-  // @Post('login')
-  // @UsePipes(ValidationPipe)
-  // @UseGuards(LocalAuthGuard)
-  // login(@Request() req) {
-  //   return this.authService.handleLogin(req.user);
-  // }
-
-  @Get('status')
-  // Dùng use guard này để bảo vệ route, đòi bearer token
-  @UseGuards(JwtAuthGuard)
-  status(@Request() req) {
-    return req.user;
-  }
-
-  @Get('mail')
-  testMail() {
-    this.mailerService.sendMail({
-      to: 'bquochuy260405@gmail.com', // list of receivers
-      subject: 'Testing Nest MailerModule ✔', // Subject line
-      text: 'welcome', // plaintext body
-      template: 'register.hbs', // HTML body content
-      context: {
-        name: 'Huy Đẹp Trai',
-        activationCode: '12345626042005',
-      },
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true, // không cho JS đọc
+      secure: false, // đổi thành true nếu chạy HTTPS (VD: deploy)
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
     });
-    return 'ok';
+
+    res.redirect(`http://localhost:3000?access_token=${access_token}`);
   }
 }

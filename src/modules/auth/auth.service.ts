@@ -409,12 +409,20 @@ export class AuthService {
   }
 
   async loginWithGoogle(user: any) {
+    const userDB = await this.usersService.findUserByEmail(user.email);
     // user ở đây được Google Strategy trả về, có thể gồm id, email, name, v.v.
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const { accessToken, refreshToken } = await this.generateTokens(user);
+
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+    await this.usersRepository.update(
+      { id: userDB.id },
+      { hashedRefreshToken },
+    );
 
     return {
       user,
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken,
     };
   }
 }
