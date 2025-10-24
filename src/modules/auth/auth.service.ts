@@ -72,6 +72,7 @@ export class AuthService {
         codeOTP,
         codeOTPExpiration,
         isOtpVerified,
+        hashedRefreshToken,
         ...user
       } = findUser;
 
@@ -193,6 +194,7 @@ export class AuthService {
       userDB.hashedRefreshToken,
       refreshToken,
     );
+
     if (!refreshTokenMatches)
       throw new UnauthorizedException('Invalid Refresh Token');
 
@@ -402,9 +404,13 @@ export class AuthService {
     if (user) return user;
 
     // Nếu chưa có user trong database => Tạo user mới và trả về user đó
-    const createdUser = this.usersRepository.create(googleUser);
-    createdUser.isActive = true;
-    createdUser.fullName = `${googleUser.firstName} ${googleUser.lastName}`;
+    const createdUser = this.usersRepository.create({
+      ...googleUser,
+      isActive: true,
+      fullName: `${googleUser.firstName} ${googleUser.lastName}`,
+      avatar: googleUser.avatarUrl,
+    });
+
     return await this.usersRepository.save(createdUser);
   }
 

@@ -10,10 +10,13 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ProductsModule } from './modules/products/products.module';
+import { Product } from './modules/products/entities/product.entity';
 
 @Module({
   imports: [
     UsersModule,
+    ProductsModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     TypeOrmModule.forRootAsync({
@@ -26,8 +29,9 @@ import { join } from 'path';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User],
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
+        autoLoadEntities: true,
       }),
     }),
     MailerModule.forRootAsync({

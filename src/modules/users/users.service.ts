@@ -23,8 +23,8 @@ export class UsersService {
     return `${baseUrl}${avatarPath}`;
   }
 
-  findUserByEmail(email: string) {
-    return this.usersRepository.findOne({ where: { email } });
+  async findUserByEmail(email: string) {
+    return await this.usersRepository.findOne({ where: { email } });
   }
 
   async handleGetUserProfile(payload: any) {
@@ -45,6 +45,7 @@ export class UsersService {
     } = user;
 
     formatedUser.avatar = this.formatAvatarUrl(formatedUser.avatar);
+
     return formatedUser;
   }
 }

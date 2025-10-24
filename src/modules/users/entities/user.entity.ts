@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
-import { UserGender, UserRole } from '../enums/user.enum';
+import { UserRole } from '../enums/user.enum';
+import { Product } from 'src/modules/products/entities/product.entity';
 
 @Entity('users')
 export class User {
@@ -29,12 +31,6 @@ export class User {
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
   role: UserRole;
-
-  @Column({ type: 'enum', enum: UserGender, nullable: true })
-  gender: UserGender;
-
-  @Column({ type: 'date', name: 'date_of_birth', nullable: true })
-  dateOfBirth: Date;
 
   // Luồng xác thực tài khoản
   @Column({ name: 'code_id', type: 'varchar', nullable: true })
@@ -65,6 +61,6 @@ export class User {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
-  // @OneToMany(() => SocialAccount, (socialAccount) => socialAccount.user)
-  // socialAccounts: SocialAccount[];
+  @OneToMany(() => Product, (product) => product.user)
+  products: Product[];
 }

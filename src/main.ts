@@ -4,7 +4,12 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true, //  Cho phép cookie gửi qua
+  });
 
   app.setGlobalPrefix('api', { exclude: ['/'] });
 

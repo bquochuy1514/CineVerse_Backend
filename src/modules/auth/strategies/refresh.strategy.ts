@@ -22,10 +22,13 @@ export class RefreshJwtStrategy extends PassportStrategy(
           // Ưu tiên lấy token từ header
           let token = null;
           if (req.headers.authorization?.startsWith('Bearer ')) {
+            console.log('Found refresh token in header ✅');
             token = req.headers.authorization.split(' ')[1];
+            console.log('token in header = ', token);
           }
           // Nếu không có header thì thử lấy từ cookie
           if (!token && req.cookies?.refresh_token) {
+            console.log('Found refresh token in cookie ✅');
             token = req.cookies.refresh_token;
           }
           return token;
@@ -39,8 +42,9 @@ export class RefreshJwtStrategy extends PassportStrategy(
 
   async validate(req: Request, payload: any) {
     const refreshToken =
-      req.cookies?.refresh_token ||
-      req.headers.authorization?.replace('Bearer', '').trim();
+      req.headers.authorization?.replace('Bearer', '').trim() ||
+      req.cookies?.refresh_token;
+    console.log(refreshToken);
 
     if (!refreshToken) {
       throw new UnauthorizedException('Missing refresh token');
