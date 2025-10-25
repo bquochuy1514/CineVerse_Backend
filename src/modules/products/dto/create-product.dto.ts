@@ -31,7 +31,7 @@ export class CreateProductDto {
   @IsString()
   location?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   image_urls?: string; // có thể là JSON.stringify([...])
 

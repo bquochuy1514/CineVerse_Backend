@@ -39,7 +39,7 @@ export class Product {
   location: string;
 
   @Column({ type: 'text', nullable: true })
-  image_urls: string; // có thể lưu JSON.stringify([...])
+  image_urls: string;
 
   @Column({ type: 'boolean', default: false })
   is_sold: boolean;

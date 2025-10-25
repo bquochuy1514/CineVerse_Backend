@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import { SerializedUser } from './types';
 
 @Injectable()
 export class UsersService {
@@ -33,19 +34,24 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const {
-      password,
-      codeId,
-      codeExpiration,
-      codeOTP,
-      codeOTPExpiration,
-      isOtpVerified,
-      hashedRefreshToken,
-      ...formatedUser
-    } = user;
+    user.avatar = this.formatAvatarUrl(user.avatar);
+    return user;
 
-    formatedUser.avatar = this.formatAvatarUrl(formatedUser.avatar);
+    // const formatedUser = new SerializedUser(user);
 
-    return formatedUser;
+    // // const {
+    // //   password,
+    // //   codeId,
+    // //   codeExpiration,
+    // //   codeOTP,
+    // //   codeOTPExpiration,
+    // //   isOtpVerified,
+    // //   hashedRefreshToken,
+    // //   ...formatedUser
+    // // } = user;
+
+    // formatedUser.avatar = this.formatAvatarUrl(formatedUser.avatar);
+
+    // return formatedUser;
   }
 }

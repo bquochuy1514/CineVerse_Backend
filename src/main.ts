@@ -1,6 +1,10 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  ClassSerializerInterceptor,
+  ValidationPipe,
+} from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -13,8 +17,14 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api', { exclude: ['/'] });
 
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true, //  cho phép tự động chuyển đổi kiểu dữ liệu
+      transformOptions: {
+        enableImplicitConversion: true, //  tự động đổi "200" -> 200
+      },
       exceptionFactory: (errors) => {
         const result = errors.map((err) => ({
           field: err.property,

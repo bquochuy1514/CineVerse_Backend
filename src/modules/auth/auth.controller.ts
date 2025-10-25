@@ -4,16 +4,12 @@ import {
   Get,
   Post,
   Req,
-  Request,
   Res,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { MailerService } from '@nestjs-modules/mailer';
 import { LoginDto } from './dto/login.dto';
 import { VerifyAccountDto } from './dto/verify-account.dto';
 import { ResendCodeDto } from './dto/resend-code.dto';
@@ -25,19 +21,14 @@ import { RefreshAuthGuard } from './guards/refresh-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly mailerService: MailerService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @UsePipes(ValidationPipe)
   login(@Body() loginDto: LoginDto) {
     return this.authService.handleLogin(loginDto);
   }
 
   @Post('register')
-  @UsePipes(ValidationPipe)
   register(@Body() registerDto: RegisterDto) {
     return this.authService.handleRegister(registerDto);
   }
@@ -67,7 +58,6 @@ export class AuthController {
   }
 
   @Post('verify-account')
-  @UsePipes(ValidationPipe)
   verifyAccount(@Body() verifyAccountDto: VerifyAccountDto) {
     return this.authService.handleVerifyAccount(verifyAccountDto);
   }
