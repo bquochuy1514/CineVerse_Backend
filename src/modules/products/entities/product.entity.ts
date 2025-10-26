@@ -9,12 +9,14 @@ import {
 } from 'typeorm';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ProductCondition } from '../enums/product.enum';
+import { Category } from 'src/modules/categories/entities/category.entity';
 
 @Entity('products')
 export class Product {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
+  // Join user
   @ManyToOne(() => User, (user) => user.products, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
@@ -34,6 +36,13 @@ export class Product {
     default: ProductCondition.GOOD,
   })
   condition: ProductCondition;
+
+  // Join category
+  @ManyToOne(() => Category, (category) => category.products, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   location: string;

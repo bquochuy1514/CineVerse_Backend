@@ -49,7 +49,7 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(UploadProductImages())
   @Put(':id')
-  update(
+  updateProductById(
     @Param('id') id: number,
     @Body() updateProductDto: UpdateProductDto,
     @Req() req,
@@ -64,7 +64,8 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  deleteProductById(@Param('id') id: number, @Req() req) {
+    return this.productsService.handleDeleteProductById(id, req.user);
   }
 }

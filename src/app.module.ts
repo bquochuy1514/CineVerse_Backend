@@ -12,6 +12,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ProductsModule } from './modules/products/products.module';
 import { Product } from './modules/products/entities/product.entity';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { Product } from './modules/products/entities/product.entity';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'), // thư mục chứa ảnh
     }),
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

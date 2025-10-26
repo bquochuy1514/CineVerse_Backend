@@ -7,6 +7,7 @@ export class SerializedUser {
   avatar: string;
   phone: string;
   role: string;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 
@@ -15,7 +16,6 @@ export class SerializedUser {
   @Exclude() codeId: string;
   @Exclude() codeExpiration: Date;
   @Exclude() codeOTP: string;
-  @Exclude() isActive: boolean;
   @Exclude() codeOTPExpiration: Date;
   @Exclude() isOtpVerified: boolean;
   @Exclude() hashedRefreshToken: string;

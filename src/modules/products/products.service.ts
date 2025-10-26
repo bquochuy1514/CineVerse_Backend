@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -14,6 +15,7 @@ import { UsersService } from '../users/users.service';
 import { SerializedUser } from '../users/types';
 import * as path from 'path';
 import * as fs from 'fs';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class ProductsService {
@@ -21,6 +23,7 @@ export class ProductsService {
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
     private readonly usersService: UsersService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async handleCreateProduct(
@@ -32,6 +35,17 @@ export class ProductsService {
     const userDB = await this.usersService.handleGetUserProfile(user);
     if (!userDB) throw new UnauthorizedException('User Not Found');
 
+    // Lấy category nếu có
+    let category = null;
+    if (createProductDto.category_id) {
+      category = await this.categoriesService.handleGetCategoryById(
+        createProductDto.category_id,
+      );
+      if (!category) {
+        throw new BadRequestException('Category không tồn tại');
+      }
+    }
+
     const imageUrls: string[] =
       files?.map(
         (file) => `${process.env.APP_URL}/images/products/${file.filename}`,
@@ -41,6 +55,7 @@ export class ProductsService {
       ...createProductDto,
       image_urls: JSON.stringify(imageUrls),
       user: userDB,
+      category,
     });
 
     const savedProduct = await this.productsRepository.save(product);
@@ -50,13 +65,14 @@ export class ProductsService {
       product: {
         ...savedProduct,
         user: new SerializedUser(userDB),
+        category,
       },
     };
   }
 
   async handleFindAllProducts() {
     const products = await this.productsRepository.find({
-      relations: ['user'],
+      relations: ['user', 'category'],
       order: { created_at: 'DESC' },
     });
 
@@ -70,7 +86,7 @@ export class ProductsService {
   async handleGetProductById(id: number) {
     const productDB = await this.productsRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['user', 'category'],
     });
 
     if (!productDB) {
@@ -92,7 +108,7 @@ export class ProductsService {
     const userDB = await this.usersService.findUserByEmail(user.email);
     const productDB = await this.productsRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['user', 'category'],
     });
 
     if (!productDB) {
@@ -119,14 +135,16 @@ export class ProductsService {
     const deleteImages = oldImages.filter((img) => !keepImages.includes(img));
 
     // Xóa ảnh bị loại khỏi file system
-    deleteImages.forEach((url) => {
-      const filePath = path.join(
-        __dirname,
-        '../../../public/images/products',
-        path.basename(url),
-      );
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    });
+    await Promise.all(
+      deleteImages.map((url) => {
+        const filePath = path.join(
+          __dirname,
+          '../../../public/images/products',
+          path.basename(url),
+        );
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      }),
+    );
 
     // Thêm ảnh mới (nếu có)
     const newImages =
@@ -146,7 +164,7 @@ export class ProductsService {
     // Lấy lại sản phẩm sau khi update
     const updatedProduct = await this.productsRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['user', 'category'],
     });
 
     return {
@@ -158,7 +176,42 @@ export class ProductsService {
     };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async handleDeleteProductById(id: number, user: any) {
+    const userDB = await this.usersService.findUserByEmail(user.email);
+    const productDB = await this.productsRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    if (!productDB) {
+      throw new NotFoundException('Không tìm thấy sản phẩm');
+    }
+
+    if (userDB.id !== productDB.user.id && userDB.role !== 'admin') {
+      throw new ForbiddenException('Bạn không có quyền xoá sản phẩm này');
+    }
+
+    const currentImagesUrls: string[] = JSON.parse(
+      productDB.image_urls || '[]',
+    );
+
+    // Xóa ảnh khỏi file system
+    await Promise.all(
+      currentImagesUrls.map((url) => {
+        const filePath = path.join(
+          __dirname,
+          '../../../public/images/products',
+          path.basename(url),
+        );
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      }),
+    );
+
+    // Delete dữ liệu
+    await this.productsRepository.delete(id);
+
+    return {
+      message: 'Xoá sản phẩm thành công',
+    };
   }
 }

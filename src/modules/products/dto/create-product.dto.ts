@@ -27,6 +27,9 @@ export class CreateProductDto {
   @IsEnum(ProductCondition)
   condition?: ProductCondition;
 
+  @IsNotEmpty()
+  category_id: number;
+
   @IsOptional()
   @IsString()
   location?: string;
