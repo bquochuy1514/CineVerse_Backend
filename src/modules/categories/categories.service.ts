@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UploadedFile,
 } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -9,6 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { slugify } from 'src/common/utils/slugify';
+import { join } from 'path';
+import { unlink } from 'fs/promises';
 
 @Injectable()
 export class CategoriesService {
@@ -17,7 +20,10 @@ export class CategoriesService {
     private categoriesRepository: Repository<Category>,
   ) {}
 
-  async handleCreateCategory(createCategoryDto: CreateCategoryDto) {
+  async handleCreateCategory(
+    createCategoryDto: CreateCategoryDto,
+    @UploadedFile() icon: Express.Multer.File,
+  ) {
     const existingCategory = await this.categoriesRepository.findOne({
       where: { name: createCategoryDto.name },
     });
@@ -28,6 +34,10 @@ export class CategoriesService {
 
     // Tạo slug từ name
     const slug = slugify(createCategoryDto.name);
+
+    if (icon) {
+      createCategoryDto.icon_url = `${process.env.APP_URL}/images/categories/${icon.filename}`;
+    }
 
     // Tạo entity mới
     const category = this.categoriesRepository.create({
@@ -50,6 +60,7 @@ export class CategoriesService {
   async handleUpdateCategoryById(
     id: number,
     updateCategoryDto: UpdateCategoryDto,
+    @UploadedFile() icon: Express.Multer.File,
   ) {
     // Tìm category
     const category = await this.categoriesRepository.findOne({ where: { id } });
@@ -73,6 +84,19 @@ export class CategoriesService {
     }
     if (updateCategoryDto.is_active) {
       category.is_active = updateCategoryDto.is_active;
+    }
+
+    if (icon) {
+      const oldIcon = category.icon_url;
+      const relativePath = new URL(oldIcon).pathname;
+      category.icon_url = `${process.env.APP_URL}/images/categories/${icon.filename}`;
+      const filePath = join(process.cwd(), 'public', relativePath);
+      try {
+        await unlink(filePath);
+      } catch (err) {
+        console.warn('Không thể xóa ảnh cũ:', filePath, err.message);
+        // không throw để user vẫn update được
+      }
     }
 
     // Lưu lại DB

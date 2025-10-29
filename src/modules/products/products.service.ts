@@ -12,7 +12,7 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from '../users/users.service';
-import { SerializedUser } from '../users/types';
+import { SerializedUser } from 'src/common/types';
 import * as path from 'path';
 import * as fs from 'fs';
 import { CategoriesService } from '../categories/categories.service';

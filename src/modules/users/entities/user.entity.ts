@@ -32,7 +32,17 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
   role: UserRole;
 
-  // Luồng xác thực tài khoản
+  // --- Profile information ---
+  @Column({ type: 'text', nullable: true })
+  bio: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  university: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  address: string;
+
+  // --- Account verification fields ---
   @Column({ name: 'code_id', type: 'varchar', nullable: true })
   codeId: string;
 
@@ -42,7 +52,7 @@ export class User {
   @Column({ name: 'is_active', type: 'boolean', default: false })
   isActive: boolean;
 
-  // Luồng xác thực OTP của quên mật khẩu
+  // --- Password reset OTP flow ---
   @Column({ name: 'code_otp', type: 'varchar', length: 6, nullable: true })
   codeOTP: string;
 

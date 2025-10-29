@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
-import { SerializedUser } from './types';
+import { SerializedUser } from 'src/common/types';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UpdateProfileDto } from './dto/update-user-profile.dto';
 import { join } from 'path';

@@ -18,6 +18,12 @@ export class Category {
   @Column({ default: true })
   is_active: boolean;
 
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
+  icon_url: string;
+
   @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 

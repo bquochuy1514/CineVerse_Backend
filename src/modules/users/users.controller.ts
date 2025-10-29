@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { SerializedUser } from './types';
+import { SerializedUser } from 'src/common/types';
 import { UserRole } from './enums/user.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';

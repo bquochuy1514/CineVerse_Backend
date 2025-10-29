@@ -7,6 +7,10 @@ export class CreateCategoryDto {
 
   @IsOptional()
   @IsString()
+  icon_url: string;
+
+  @IsOptional()
+  @IsString()
   description?: string;
 
   @IsOptional()
